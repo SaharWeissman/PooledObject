@@ -1,7 +1,5 @@
 package com.saharw.pooledobject;
 
-import com.saharw.pooledobject.entities.PooledObject;
-
 /**
  * Created by Sahar on 01/27/2017.
  */

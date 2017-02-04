@@ -50,93 +50,94 @@ public class PooledObjects {
             BYTEARRAY, CHARARRAY, INTARRAY, LONGARRAY, STRINGARRAY, SPARSEARRAY, SPARSEBOOLEANARRAY,
             BUNDLE, PARCELABLE, PARCELABLEARRAY, CHARSEQUENCE, IBINDER, OBJECTARRAY,
             SERIALIZABLE, PERSISTABLEBUNDLE, SIZE, SIZEF);
+    private static String POOLED_CLASS_PREFIX = "Pooled_";
 
     static void readValue(String className, CodeBlock.Builder block, PooledObjectProcessor.Property property, final TypeName pooledType) {
 
         if (property.isNullable()) {
-            block.add("object.readInt() == 0 ? ");
+            block.add("o.readInt() == 0 ? ");
         }
 
         if (pooledType.equals(STRING)) {
-            block.add("((" + className + ")object)." + property.fieldName);
+            block.add("((" + className.replaceFirst(POOLED_CLASS_PREFIX, "") + ")o)." + property.fieldName);
         } else if (pooledType.equals(TypeName.BYTE) || pooledType.equals(TypeName.BYTE.box())) {
-            block.add("object.readByte()");
+            block.add("o.readByte()");
         } else if (pooledType.equals(TypeName.INT) || pooledType.equals(TypeName.INT.box())) {
-            block.add("((" + className + ")object)." + property.fieldName);
+            block.add("((" + className.replaceFirst(POOLED_CLASS_PREFIX, "") + ")o)." + property.fieldName);
         } else if (pooledType.equals(TypeName.SHORT) || pooledType.equals(TypeName.SHORT.box())) {
-            block.add("(short) object.readInt()");
+            block.add("(short) o.readInt()");
         } else if (pooledType.equals(TypeName.CHAR) || pooledType.equals(TypeName.CHAR.box())) {
-            block.add("(char) object.readInt()");
+            block.add("(char) o.readInt()");
         } else if (pooledType.equals(TypeName.LONG) || pooledType.equals(TypeName.LONG.box())) {
-            block.add("object.readLong()");
+            block.add("o.readLong()");
         } else if (pooledType.equals(TypeName.FLOAT) || pooledType.equals(TypeName.FLOAT.box())) {
-            block.add("object.readFloat()");
+            block.add("o.readFloat()");
         } else if (pooledType.equals(TypeName.DOUBLE) || pooledType.equals(TypeName.DOUBLE.box())) {
-            block.add("object.readDouble()");
+            block.add("o.readDouble()");
         } else if (pooledType.equals(TypeName.BOOLEAN) || pooledType.equals(TypeName.BOOLEAN.box())) {
-            block.add("((" + className + ")object)." + property.fieldName);
+            block.add("((" + className.replaceFirst(POOLED_CLASS_PREFIX, "") + ")o)." + property.fieldName);
         } else if (pooledType.equals(PARCELABLE)) {
             if (property.typeName.equals(PARCELABLE)) {
-                block.add("object.readParcelable($T.class.getClassLoader())", pooledType);
+                block.add("o.readParcelable($T.class.getClassLoader())", pooledType);
             } else {
-                block.add("($T) object.readParcelable($T.class.getClassLoader())", property.typeName, property.typeName);
+                block.add("($T) o.readParcelable($T.class.getClassLoader())", property.typeName, property.typeName);
             }
         } else if (pooledType.equals(CHARSEQUENCE)) {
             block.add("$T.CHAR_SEQUENCE_CREATOR.createFromParcel(in)", TEXTUTILS);
 //        } else if (pooledType.equals(MAP)) {
-//            block.add("($T) object.readHashMap($T.class.getClassLoader())", property.typeName, pooledType);
+//            block.add("($T) o.readHashMap($T.class.getClassLoader())", property.typeName, pooledType);
         } else if (pooledType.equals(LIST)) {
-            block.add("($T) object.readArrayList($T.class.getClassLoader())", property.typeName, pooledType);
+            block.add("($T) o.readArrayList($T.class.getClassLoader())", property.typeName, pooledType);
         } else if (pooledType.equals(BOOLEANARRAY)) {
-            block.add("object.createBooleanArray()");
+            block.add("o.createBooleanArray()");
         } else if (pooledType.equals(BYTEARRAY)) {
-            block.add("object.createByteArray()");
+            block.add("o.createByteArray()");
         } else if (pooledType.equals(CHARARRAY)) {
-            block.add("object.createCharArray()");
+            block.add("o.createCharArray()");
         } else if (pooledType.equals(STRINGARRAY)) {
-            block.add("object.readStringArray()");
+            block.add("o.readStringArray()");
         } else if (pooledType.equals(IBINDER)) {
             if (property.typeName.equals(IBINDER)) {
-                block.add("object.readStrongBinder()");
+                block.add("o.readStrongBinder()");
             } else {
-                block.add("($T) object.readStrongBinder()", property.typeName);
+                block.add("($T) o.readStrongBinder()", property.typeName);
             }
         } else if (pooledType.equals(OBJECTARRAY)) {
-            block.add("object.readArray($T.class.getClassLoader())", pooledType);
+            block.add("o.readArray($T.class.getClassLoader())", pooledType);
         } else if (pooledType.equals(INTARRAY)) {
-            block.add("object.createIntArray()");
+            block.add("o.createIntArray()");
         } else if (pooledType.equals(LONGARRAY)) {
-            block.add("object.createLongArray()");
+            block.add("o.createLongArray()");
         } else if (pooledType.equals(SERIALIZABLE)) {
             if (property.typeName.equals(SERIALIZABLE)) {
-                block.add("object.readSerializable()");
+                block.add("o.readSerializable()");
             } else {
-                block.add("($T) object.readSerializable()", property.typeName);
+                block.add("($T) o.readSerializable()", property.typeName);
             }
         } else if (pooledType.equals(PARCELABLEARRAY)) {
             ArrayTypeName atype = (ArrayTypeName) property.typeName;
             if (atype.componentType.equals(PARCELABLE)) {
-                block.add("object.readParcelableArray($T.class.getClassLoader())", pooledType);
+                block.add("o.readParcelableArray($T.class.getClassLoader())", pooledType);
             } else {
                 // FIXME: 31/07/16 not sure if this works
-                block.add("($T) object.readParcelableArray($T.class.getClassLoader())", atype, pooledType);
+                block.add("($T) o.readParcelableArray($T.class.getClassLoader())", atype, pooledType);
             }
         } else if (pooledType.equals(SPARSEARRAY)) {
-            block.add("object.readSparseArray($T.class.getClassLoader())", pooledType);
+            block.add("o.readSparseArray($T.class.getClassLoader())", pooledType);
         } else if (pooledType.equals(SPARSEBOOLEANARRAY)) {
-            block.add("object.readSparseBooleanArray()");
+            block.add("o.readSparseBooleanArray()");
         } else if (pooledType.equals(BUNDLE)) {
-            block.add("object.readBundle($T.class.getClassLoader())", property.typeName);
+            block.add("o.readBundle($T.class.getClassLoader())", property.typeName);
         } else if (pooledType.equals(PERSISTABLEBUNDLE)) {
-            block.add("object.readPersistableBundle($T.class.getClassLoader())", property.typeName);
+            block.add("o.readPersistableBundle($T.class.getClassLoader())", property.typeName);
         } else if (pooledType.equals(SIZE)) {
-            block.add("object.readSize()");
+            block.add("o.readSize()");
         } else if (pooledType.equals(SIZEF)) {
-            block.add("object.readSizeF()");
+            block.add("o.readSizeF()");
         } else if (pooledType.equals(ENUM)) {
-            block.add("$T.valueOf(object.readString())", property.typeName);
+            block.add("$T.valueOf(o.readString())", property.typeName);
         } else {
-            block.add("($T) object.readValue($T.class.getClassLoader())", property.typeName, pooledType);
+            block.add("($T) o.readValue($T.class.getClassLoader())", property.typeName, pooledType);
         }
 
         if (property.isNullable()) {
@@ -146,7 +147,7 @@ public class PooledObjects {
 
     public static void readValueWithTypeAdapter(String className, CodeBlock.Builder block, PooledObjectProcessor.Property property, final FieldSpec adapter) {
         if (property.isNullable()) {
-            block.add("object." + property.fieldName);
+            block.add("o." + property.fieldName);
         }
         block.add("$N.fromParcel(in)", adapter);
         if (property.isNullable()) {
