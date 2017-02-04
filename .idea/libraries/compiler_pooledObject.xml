@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="compiler.pooledObject">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/compiler/build/libs/pooledObject.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

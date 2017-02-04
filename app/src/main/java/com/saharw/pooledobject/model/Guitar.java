@@ -41,10 +41,6 @@ public class Guitar {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-//        this.mManufacturer = manufacturer;
-//        this.mYear = year;
-//        this.mColor = color;
-//        this.mIsPlaying = isPlaying;
         sb.append("Guitar: {manu.:" + mManufacturer + ", year:" + mYear + ", color:" + mColor + ", isPlaying:" + mIsPlaying + "}");
         return sb.toString();
     }
