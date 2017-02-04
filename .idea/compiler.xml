@@ -15,8 +15,13 @@
     </wildcardResourcePatterns>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true">
-        <processorPath useClasspath="false">
+        <processorPath useClasspath="true">
           <entry name="$PROJECT_DIR$/../PhoneLeech/PhoneLeech/compiler/src/main/java/com/aitorvs/autoparcel/internal/codegen/AutoParcelProcessor.java" />
+        </processorPath>
+      </profile>
+      <profile default="false" name="PooledObjectAnnotationProcessor" enabled="true">
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/compiler/src/main/java/com/saharw/objectpool/codegen/PooledObjectProcessor.java" />
         </processorPath>
       </profile>
     </annotationProcessing>
