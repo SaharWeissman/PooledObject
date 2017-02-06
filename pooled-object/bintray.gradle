@@ -1,0 +1,54 @@
+apply plugin: 'com.jfrog.bintray'
+
+task loadBintrayProps {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('bintray.properties').newDataInputStream())
+    project.set("bintrayUser", properties.getProperty("bintray.user"));
+    project.set("bintrayApiKey", properties.getProperty("bintray.apikey"));
+    project.set("libVersion", properties.getProperty("lib.version"));
+    project.set("repoName", properties.getProperty("repo.name"));
+    project.set("pkgName", properties.getProperty("pkg.name"));
+    project.set("pkgDesc", properties.getProperty("pkg.desc"));
+    project.set("websiteUrl", properties.getProperty("website.url"));
+    project.set("vcsUrl", properties.getProperty("vcs.url"));
+    project.set("licenses", properties.getProperty("licenses"));
+    project.set("publish", properties.getProperty("publish"));
+    project.set("publicDownloadNumbers", properties.getProperty("public.downloadnumbers"));
+}
+
+version = project.libVersion
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+}
+
+//task bintrayJavadoc(type: Javadoc) {
+//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+//    archives javadocJar
+    archives sourcesJar
+}
+
+// Bintray
+bintray {
+    user = project.bintrayUser
+    key = project.bintrayApiKey
+    configurations = ['archives']
+    pkg {
+        repo = project.repoName
+        name = project.pkgName
+        desc = project.pkgDesc
+        websiteUrl = project.websiteUrl
+        vcsUrl = project.vcsUrl
+        licenses = project.licenses
+        publish = project.publish
+        publicDownloadNumbers = project.publicDownloadNumbers
+    }
+}
+

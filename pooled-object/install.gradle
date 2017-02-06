@@ -1,0 +1,53 @@
+apply plugin: 'com.github.dcendents.android-maven'
+
+task loadMavenProps {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('maven.properties').newDataInputStream())
+    project.set("groupId", properties.getProperty("group.id"));
+    project.set("artifactId", properties.getProperty("artifact.id"));
+    project.set("libName", properties.getProperty("lib.name"));
+    project.set("siteUrl", properties.getProperty("site.url"));
+    project.set("developerId", properties.getProperty("developer.id"));
+    project.set("developerName", properties.getProperty("developer.name"));
+    project.set("developerMail", properties.getProperty("developer.mail"));
+    project.set("scmConnection", properties.getProperty("scm.connection"));
+    project.set("scmDeveloperConnection", properties.getProperty("scm.developerConnection"));
+    project.set("scmUrl", properties.getProperty("scm.url"));
+    project.set("licenseName", properties.getProperty("license.name"));
+    project.set("licenseUrl", properties.getProperty("license.url"));
+}
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                groupId project.groupId // group name
+                artifactId project.artifactId // module name
+
+                name project.libName // library name
+                description 'a Java Library that helps impl. the Object Pool Design pattern by using Annotations'
+                url project.siteUrl
+
+                licenses {
+                    license {
+                        name project.licenseName
+                        url project.licenseUrl
+                    }
+                }
+                developers {
+                    developer {
+                        id project.developerId
+                        name project.developerName
+                        email project.developerMail
+                    }
+                }
+                scm {
+                    connection project.scmConnection
+                    developerConnection project.scmDeveloperConnection
+                    url project.scmUrl
+                }
+            }
+        }
+    }
+}

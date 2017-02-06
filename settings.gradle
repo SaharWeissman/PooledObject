@@ -1,1 +1,1 @@
-include ':app', ':compiler', ':library', ':adapter'
+include ':app', ':pooled-object', ':library', ':adapter'
