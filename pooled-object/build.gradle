@@ -2,10 +2,43 @@ apply plugin: 'java'
 apply plugin: 'net.ltgt.apt'
 apply plugin: 'eu.appsatori.fatjar'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven'
 
 def POOLED_JAR_NAME = "pooledObject.jar"
 
+fatJarPrepareFiles {
+    exclude 'groovy.**/.**'
+    exclude 'groovyjar.**/.**'
+    exclude 'org.codehause'
+    exclude 'META-INF/maven/.**'
+    exclude 'META-INF/services/.**'
+    exclude 'overview.html'
+    exclude 'overviewj.html'
+}
+
 fatJar {
+}
+
+configurations {
+    provided
+}
+
+def version = "1.0.00"
+
+task loadBintrayProps {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('bintray.properties').newDataInputStream())
+    project.ext.setProperty("bintrayUser", properties.getProperty("bintray.user"));
+    project.ext.setProperty("bintrayApiKey", properties.getProperty("bintray.apikey"));
+    project.ext.setProperty("libVersion", properties.getProperty("lib.version"));
+    project.ext.setProperty("repoName", properties.getProperty("repo.name"));
+    project.ext.setProperty("pkgName", properties.getProperty("pkg.name"));
+    project.ext.setProperty("pkgDesc", properties.getProperty("pkg.desc"));
+    project.ext.setProperty("websiteUrl", properties.getProperty("website.url"));
+    project.ext.setProperty("vcsUrl", properties.getProperty("vcs.url"));
+    project.ext.setProperty("licenses", properties.getProperty("licenses"));
+    project.ext.setProperty("publish", properties.getProperty("publish"));
+    project.ext.setProperty("publicDownloadNumbers", properties.getProperty("public.downloadnumbers"));
 }
 
 dependencies {
@@ -14,11 +47,69 @@ dependencies {
     compile project(':library')
     apt project(':library')
     apt project(':adapter')
-    compile 'com.google.auto.service:auto-service:1.0-rc2'
-    compile 'com.squareup:javapoet:1.7.0'
-    compile 'com.google.guava:guava:19.0'
-    compile 'org.codehaus.groovy:groovy-all:2.4.7'
+    compile 'com.google.auto.service:auto-service:1.0-rc2', {
+        ext {
+            fatJarExclude = true
+        }
+    }
+    compile 'com.squareup:javapoet:1.7.0', {
+        ext {
+            fatJarExclude = true
+        }
+    }
+    compile 'com.google.guava:guava:19.0', {
+        ext {
+            fatJarExclude = true
+        }
+    }
+    compile 'org.codehaus.groovy:groovy-all:2.4.7', {
+        ext {
+            fatJarExclude = true
+        }
+    }
     jar {
         baseName POOLED_JAR_NAME
     }
+
 }
+// Bintray
+bintray {
+    user = project.bintrayUser
+    key = project.bintrayApiKey
+    filesSpec {
+        from 'build/libs'
+        into "releases/${version}"
+    }
+
+    pkg {
+        repo = project.repoName
+        name = project.pkgName
+        desc = project.pkgDesc
+        websiteUrl = project.websiteUrl
+        vcsUrl = project.vcsUrl
+        licenses = project.licenses
+        publish = project.publish
+        publicDownloadNumbers = project.publicDownloadNumbers
+
+//        version {
+//            name = "1.0.00" //Bintray logical version name
+//            desc = "first impl."
+//            released  = "2017-02-09'T'23:33:00.00000"
+//            vcsTag = '1.0.00'
+            //Optional configuration for GPG signing
+//            gpg {
+//                sign = true //Determines whether to GPG sign the files. The default is false
+//                passphrase = project.gpgPasspharse //Optional. The passphrase for GPG signing'
+//            }
+            //Optional configuration for Maven Central sync of the version
+            //for nexus server
+//            mavenCentralSync {
+//                sync = true //[Default: true] Determines whether to sync the version to Maven Central.
+//                user = 'userToken' //OSS user token: mandatory
+//                password = 'paasword' //OSS user password: mandatory
+//                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+//            }
+//        }
+    }
+}
+
